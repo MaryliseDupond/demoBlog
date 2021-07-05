@@ -1,0 +1,5 @@
+3 pilliers fondamentaux de Symfony
+
+- Les controlleurs (traitement des données PHP)
+- Doctrine : ORM (Object Relational Mapping): Accès aux données, creation de requête SQL) Esclave SQL. Doctrine va générer automatiquement les requêtes SQL
+TWIG: langage de rendu, moteur de template
