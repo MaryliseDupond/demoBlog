@@ -1,5 +1,5 @@
 <?php
-
+//TODO: on a crée les fixtures via une ligne de commande via le composer et doctrine
 namespace App\DataFixtures;
 
 use App\Entity\Article;
@@ -26,10 +26,13 @@ class ArticleFixtures extends Fixture
 
             //! Appel du Manager. Un manager (ObjectManager) en Symfony est un classe permettant, entre autre, de manipuler les lignes de la BDD (INSERT, UPDATE, DELETE)
             $manager->persist($article);//! persist() va récupérer les données et les garde en mémoire les données
+            //? persit(): méthode issue de la classe ObjectManager
             //TODO: cette ligne équivaut à:
             //TODO: $data = $bdd->prepare(INSERT INTO article VALUES ('getTitre()', getContenu()' etc)")
         }
         //! flush() : méthode issue de la classe ObjectManager permettant véritablement d'executer les requetes d'insertions en BDD
-        $manager->flush();//! Balance le contenu dans la BDD, execute
+        $manager->flush();//TODO Balance le contenu dans la BDD équivaut à execute()
+
+        //TODO: on demande à doctrine de charger les fixtures via la ligne de commande php bin/console doctrine:fixture:load et le tout sera inséré dans la nouvelle table
     }
 }
