@@ -105,3 +105,7 @@
 .conteneur-base{
   min-height: 50vh;
 }
+
+.bandeau-header{
+  background-color: rgb(255, 0, 106);
+}

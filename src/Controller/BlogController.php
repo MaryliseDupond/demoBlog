@@ -2,18 +2,29 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Article;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class BlogController extends AbstractController
 {
     /**
+     * Méthode permettant d'afficher l'ensemble des articles du blog
+     * 
      * @Route("/blog", name="blog")
      */
-    public function index(): Response
+    public function blog(): Response
     {
-        return $this->render('blog/index.html.twig', [
+        //! traitement requête de sélection BDD des articles
+        //TODO: $repoArticles est un objet issu de de la classe ArticleRepository
+        $repoArticles = $this->getDoctrine()->getRepository(Article::class);
+        dump($repoArticles);
+
+        $articles = $repoArticles->findAll();
+        dump($articles);
+
+        return $this->render('blog/blog.html.twig', [
             'controller_name' => 'BlogController',
         ]);
     }
@@ -30,6 +41,19 @@ class BlogController extends AbstractController
         ]);
     }
 
+
+    // @Route("Route", name="RouteName")
+    
+    /**
+     * Méthode permettant d'afficher le détail d'un article
+     * Ici, Blog 12 est bidon car je n'ai pas encore de BDD. 1er argument = chemin, 2ème argument = nom de la route
+     * 
+     * @Route("/blog/12", name="blog_show")
+     */
+    public function show(): Response
+    {
+        return $this->render('blog/show.html.twig');
+    }
 }
 
 
