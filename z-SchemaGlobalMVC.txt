@@ -1,0 +1,11 @@
+---- Controller (route) -------> ORM DOCTRINE (selection BDD) ---- 
+                                                                 |
+                                                                 |
+                                                                 |
+                                                        SELECT + FETCHALL          
+TWIG traite les données                                 (FindAll)|
+dans le template                                                 |
+|                                                                |
+-------- Controller envoi les  <--------- DOCTRINE transmet -----|
+         données au template            données au controller
+         render()                             $article

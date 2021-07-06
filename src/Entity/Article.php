@@ -5,9 +5,12 @@ namespace App\Entity;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+//! la classe ArticleRepository contient les requêtes de sélection SQL (voir le fichier ArticleRepository dans dossier Repository)
 /**
  * @ORM\Entity(repositoryClass=ArticleRepository::class)
  */
+
+ //! id est crée par défaut, à nous de créer les autres champs avec leurs caractéristiques
 class Article
 {
     /**
@@ -89,4 +92,6 @@ class Article
 
         return $this;
     }
+
+    //TODO: après avoir caractérisé nos champs, on a dû faire des fichiers de migrations via l'invit de commande (php bin/console make:migration) que l'on retrouve dans migration Version202107...
 }

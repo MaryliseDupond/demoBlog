@@ -20,6 +20,8 @@ final class Version20210705121020 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
+        //! Ici notre table se crée.
+        //TODO: on fera ensuite une ligne de code php bin console migration:migrate dans la console de commande
         $this->addSql('CREATE TABLE article (id INT AUTO_INCREMENT NOT NULL, titre VARCHAR(255) NOT NULL, contenu LONGTEXT NOT NULL, image VARCHAR(255) DEFAULT NULL, date DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
     }
 
@@ -28,4 +30,6 @@ final class Version20210705121020 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('DROP TABLE article');
     }
+
+    //TODO: puis création de faux contenu: les FIXTURES
 }
