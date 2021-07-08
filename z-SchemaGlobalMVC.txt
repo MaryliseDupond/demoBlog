@@ -1,11 +1,14 @@
 ---- Controller (route) -------> ORM DOCTRINE (selection BDD) ---- 
+    Route à configurer          avec le repository               |
                                                                  |
                                                                  |
-                                                                 |
-                                                        SELECT + FETCHALL          
-TWIG traite les données                                 (FindAll)|
-dans le template                                                 |
+                                                    SELECT + FETCHALL
+TWIG traite les données                             (FindAll)    |
+dans le template                        je redonne au controller |
+(on fait les boucles ici)                                        |
 |                                                                |
--------- Controller envoi les  <--------- DOCTRINE transmet -----|
+------- Controller envoie les  <--------- DOCTRINE transmet -----|
          données au template            données au controller
-         render()                             $article
+         render(1,2)                           $article
+1 = Route , 2 = Array
+$article redevient un objet
