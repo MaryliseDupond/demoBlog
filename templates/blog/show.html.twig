@@ -11,6 +11,7 @@
 </pre>
 
     {# <h1 class="display-4 fst-italic text-center my-4">Détail de l'article</h1> #}
+	{# Pas besoin de boucler car on a besoin d'afficher que l'article sélectionné dans notre cas: on affiche 1 seul article #}
 
     <div class="col-md-12">
 			<div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm position-relative">
@@ -23,8 +24,11 @@
 
 					<p class="card-text">{{articleBDD.contenu|raw}}</p>
 
-					{# la fonction path() attend en argument le NOM de la route définie dans le controller dans l'annotation @Route("", name = "NOM_ROUTE") #}
-					<a href="{{path('blog')}}">Retour à la liste des articles</a> 
+					{# la fonction path() attend en argument le NOM de la route définie dans le controller dans l'annotation @Route("", name = "NOM_ROUTE"), 
+					@Route("/blog", name="blog")
+					ici le nom de la route est 'blog'#}
+					<a href="{{path('blog')}}">Retour à la liste des articles</a>
+					<a href="{{path('blog_edit', {'id': articleBDD.id}) }}">Modification de l'article</a>  
 				</div>
 				<div class="col-md-5 d-none d-lg-block d-none d-lg-block">
 					<img src="{{ articleBDD.image}}" alt="{{ articleBDD.titre}}" classe="col-md-12">
