@@ -1,7 +1,7 @@
 {% extends "base.html.twig" %}
 
 {% block title %}
-	Blog | Création d'un article (méthode 2, la plus usitée)
+	Blog | Création d'un article (création du form via l'ORM)
 {% endblock %}
 
 {% block body %}
@@ -12,7 +12,7 @@
     {% else %}
     {# Sinon editMode ne contient aucun ID d'article, il renvoi FALSE, alors c'est une insertion, on entre dans le ELSE #}
 
-        Création d'un article, méthode 2 la plus usitée
+        Création d'un article, en passant par l'ORM
     {% endif %}
     </h1>
 
@@ -23,6 +23,8 @@
         {# Mieux vaut palcer les attribut dans cette page plutôt que dans la vue (ArticleType) #}
         {{form_row(formArticle.titre, {'label': "Titre de l'article"}) }}
 
+        {{form_row(formArticle.category, {'label': "Catégorie de l'article"}) }}
+        
         {{form_row(formArticle.contenu)}}
 
         {{form_row(formArticle.image, {'label': "Titre de l'image"})}}

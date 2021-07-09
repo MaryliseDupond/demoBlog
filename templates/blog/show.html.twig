@@ -6,9 +6,10 @@
 
 {% block body %}
 
-<pre>
+{# <pre> 
 	{{ dump(articleBDD) }}
 </pre>
+#}
 
     {# <h1 class="display-4 fst-italic text-center my-4">Détail de l'article</h1> #}
 	{# Pas besoin de boucler car on a besoin d'afficher que l'article sélectionné dans notre cas: on affiche 1 seul article #}
@@ -16,7 +17,7 @@
     <div class="col-md-12">
 			<div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm position-relative">
 				<div class="col md-7 p-4 d-flex flex-column position-static">
-					<strong class="d-inline-block mb-2 text-primary">World</strong>
+					<strong class="d-inline-block mb-2 text-primary">{{articleBDD.category.titre}}</strong>
 
 					<h3 class="mb-0">{{articleBDD.titre}}</h3>
 
@@ -33,6 +34,43 @@
 				<div class="col-md-5 d-none d-lg-block d-none d-lg-block">
 					<img src="{{ articleBDD.image}}" alt="{{ articleBDD.titre}}" classe="col-md-12">
 				</div>
+			</div>
+
+			{# Affichage du formulaire d'ajout de commentaire #}
+			<h4 class="mt-5 mb-2">Donner votre avis...</h4>
+
+			{{form_start(formComment)}}
+
+			{{form_row(formComment.auteur)}}
+			{{form_row(formComment.contenuDuCommentaire)}}
+			<button type="submit" class="btn btn-dark mt-2">Publier</button>
+
+			{{form_end(formComment)}}
+
+			{# Affichage des commentaires #}
+			<h4 class="mt-5 mb-2">Vos réactions...</h4>
+
+			<div class="row">
+			{# articleBDD.comments : objet contenant tous les commentaires lié à l'article #}
+			{# Grace aux aux relations entre les tables (bi-directionnelle), en selectionnant dans la table 'Article', nous avons accès automatiquement à toute les correspondances dans les autres tables #}
+
+			{% for oneComment in articleBDD.comments %}
+			{# {{dump(oneComment)}} #}
+
+			<div class="row shadow rounded mx-0 px-0 mb-2">
+				<div class="col-md-4 py-2">
+					<strong>{{oneComment.auteur}}</strong>
+					<small class="fst-italic">Posté le {{oneComment.date|date('d/m/Y à H:i:s')}}</small>
+				</div>
+				<div class="col-md-8 py-2">
+					{# écriture d'origine: 'contenu_du_commentaire' : TWIG ne le reconnait pas, on a dû changer et mettre des majuscules. En revanche, SQL ne reconnait pas les majuscules et garde 'contenu_du_commentaire' #}
+					{{oneComment.contenuDuCommentaire|raw}}
+				</div>
+
+			
+			</div>
+				
+			{% endfor %}
 			</div>
 		</div>
 {% endblock %}

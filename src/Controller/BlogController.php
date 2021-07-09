@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\Comment;
 use App\Form\ArticleType;
-use App\Repository\ArticleRepository;
+use App\Form\CommentType;
 use Doctrine\ORM\EntityManager;
+use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -111,11 +113,15 @@ class BlogController extends AbstractController
         return $this->render('blog/create.html.twig');//! Template html.twig à créer
     }
     /**
-     * Méthode permettant d'afficher le détail d'un article'
+     * Méthode permettant d'afficher le détail d'un article ou de le modifier
      * 
      * @Route("/blog/new", name="blog_create")
      * @Route("/blog/{id}/edit", name="blog_edit")
      */
+
+    //TODO: on a demandé à l'ORM de créer un table via php bin/console make:form
+    //TODO: on a deamndé de créer la table par rapport à l'entité Article et nous l'avons appelé ArticleType
+    
     public function create(Article $article = null, Request $request, EntityManagerInterface $manager): Response
     {
         //! Si la variable $article N'EST PAS (null), si elle ne contient aucun article de la BDD, cela veut dire nous avons envoyé la route '/blog/new', c'est une insertion, on entre dans le IF et on crée une nouvelle instance de l'entité Article, création d'un nouvel article
@@ -135,8 +141,8 @@ class BlogController extends AbstractController
         //TODO En 2ème argument de createForm(), nous transmettons l'objet entité $article afin de préciser que le formulaire a pour but de remplir l'objet $article, on relie l'entité au formulaire
         $formArticle = $this->createForm(ArticleType::class, $article);
 
-        //? handleRequest() permet ici dans notre cas , de récupérer toutes les données saisies dans le formulaire et de les transmettre aux bons setteurs de l'entité $article 
-        //! handleRequest() renseigne chaque setteur de l'entité $article avec les données saisi dans le formulaire
+        //? handleRequest() permet ici dans notre cas, de récupérer toutes les données saisies dans le formulaire et de les transmettre aux bons setteurs de l'entité $article 
+        //! handleRequest() renseigne chaque setteur de l'entité $article avec les données saisies dans le formulaire
         $formArticle->handleRequest($request);
         dump($article);
 
@@ -156,6 +162,7 @@ class BlogController extends AbstractController
             //? persist() : méthode issue de l'interface EntityManagerInterface permettant de préparer et garder en mémmoire la requête d'insertion
             //TODO equivaut à $data = $bdd->prepare("INSERT INTO article VALUES ('$article->getTitre()', '$article->getContenu()')")
             $manager->persist($article);
+            
 
             //? flush() : méthode issue de l'interface EntityManagerInterface permettant veritablement d'executer le requete d'insertion en BDD
             //TODO $data->excecute()
@@ -190,13 +197,15 @@ class BlogController extends AbstractController
      * 
      * @Route("/blog/{id}", name="blog_show")
      */
-    //!public function show($id): Response / SANS L'INJECTION DE DEPENDANCE
+    //?public function show($id): Response / SANS L'INJECTION DE DEPENDANCE
     //TODO Avec l'injection de dépendance:
-    //? public function show(ArticleRepository $repoArticle, $id): Response
-    public function show(Article $article): Response //! sera suivi de render
+    //! public function show(ArticleRepository $repoArticle, $id): Response
+    public function show(Article $article, Request $request): Response //! sera suivi de render
     {
         //TODO: l'id transmis dans l'URL est envoyé directement en argument de la fonction show(), ce qui nous permet d'avoir accès à l'id de l'article à sélectionnet en BDD au sein de la méthode show()
         //dump($id);// 4
+        dump($request);// Les données du commentaire vont ben dans le request
+
 
         //TODO: importation de la classe ArticleRepository
         //? ligne non necessaire car j'ai utilisé l'injection de dépendance $repoArticle = $this->getDoctrine()->getRepository(Article::class);
@@ -209,9 +218,19 @@ class BlogController extends AbstractController
         //$article = $repoArticle->find($id);
         dump($article);//! On transmet au template les données de l'article sélectionné en BDD afin de les traiter avec le langage Twig dans le template
 
+        //? Traitement commentaire article (formulaire + insertion)
+        $comment = new Comment;
+
+        $formComment = $this->createForm(CommentType::class, $comment);
+
+        $formComment->handleRequest($request);
+        dump($comment);
+        
+
         // Affichera le template blog/show.html.twig
         return $this->render('blog/show.html.twig', [
-            'articleBDD' => $article
+            'articleBDD' => $article, //! On transmet au template les données de l'articles sélectionné en BDD afin de les traiter avec le langage TWIG dans le template
+            'formComment' => $formComment->createView()
         ]);
     }
 
