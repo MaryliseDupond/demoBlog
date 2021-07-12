@@ -9,6 +9,7 @@ use App\Form\CommentType;
 use Doctrine\ORM\EntityManager;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Entity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class BlogController extends AbstractController
 {
     /**
-     * Méthode permettant d'afficher l'ensemble des articles du blog
+     *? Méthode permettant d'afficher l'ensemble des articles du blog
      * 
      * @Route("/blog", name="blog")
      */
@@ -51,7 +52,8 @@ class BlogController extends AbstractController
     }
 
     /**
-     * Méthode permettant d'afficher le rendu de la page d'accueil du blog Symfony. Symfony lit le commentaire route pour trouver la route. Il faut écrire le code tel quel (l. 11 à 13)
+     *? Méthode permettant d'afficher le rendu de la page d'accueil du blog Symfony. Symfony lit le commentaire route pour trouver la route. Il faut écrire le code tel quel (l. 11 à 13)
+
      * @Route("/" , name = "home")
      */
     public function home(): Response
@@ -64,7 +66,7 @@ class BlogController extends AbstractController
     }
 
     /**
-     * Méthode permettant de créer un nouvel article et de modifier un article existant
+    *? Méthode permettant de créer un nouvel article et de modifier un article existant
      * 
      * @Route("/blog/new_old", name="blog_create_old")
      */
@@ -113,7 +115,7 @@ class BlogController extends AbstractController
         return $this->render('blog/create.html.twig');//! Template html.twig à créer
     }
     /**
-     * Méthode permettant d'afficher le détail d'un article ou de le modifier
+     *? Méthode permettant d'afficher le détail d'un article ou de le modifier
      * 
      * @Route("/blog/new", name="blog_create")
      * @Route("/blog/{id}/edit", name="blog_edit")
@@ -192,7 +194,7 @@ class BlogController extends AbstractController
     // @Route("Route", name="RouteName")
     
     /**
-     * Méthode permettant d'afficher le détail d'un article
+     *? Méthode permettant d'afficher le détail d'un article
      * Ici, Blog/4. 1er argument = chemin, 2ème argument = nom de la route
      * 
      * @Route("/blog/{id}", name="blog_show")
@@ -200,11 +202,11 @@ class BlogController extends AbstractController
     //?public function show($id): Response / SANS L'INJECTION DE DEPENDANCE
     //TODO Avec l'injection de dépendance:
     //! public function show(ArticleRepository $repoArticle, $id): Response
-    public function show(Article $article, Request $request): Response //! sera suivi de render
+    public function show(Article $article, Request $request, EntityManagerInterface $manager): Response //! sera suivi de render
     {
         //TODO: l'id transmis dans l'URL est envoyé directement en argument de la fonction show(), ce qui nous permet d'avoir accès à l'id de l'article à sélectionnet en BDD au sein de la méthode show()
         //dump($id);// 4
-        dump($request);// Les données du commentaire vont ben dans le request
+        dump($request);// Les données du commentaire vont bien dans le request
 
 
         //TODO: importation de la classe ArticleRepository
@@ -223,14 +225,51 @@ class BlogController extends AbstractController
 
         $formComment = $this->createForm(CommentType::class, $comment);
 
-        $formComment->handleRequest($request);
+        $formComment->handleRequest($request);//! handleRquest récupère les données saisies et les réinjecte dans le bon champs:
+            //TODO: $comment->setAuteur('$_POST[auteur]')| $comment->setCommentaire('$_POST[commentaire]')
         dump($comment);
+
+        if($formComment->isSubmitted() && $formComment->isValid()) //! isValid= Bonne entité au bons setters?
+        //Il reste 2 setters à appeler: la date et l'id de l'article
+        {
+            
+            $comment->setDate(new \DateTime());
+
+            // On établit la relation entre le commentaire et l'article (clé étrangère)
+            // setArticle() : méthode issue de l'entité Comment qui permet de rensigner l'article associé au commentaire
+            // Cette méthode attends en argument l'objet entité Article de la BDD et non la clé étrangère elle même
+            $comment->setArticle($article);
+
+            $manager->persist($comment);
+            $manager->flush($comment);
+
+            //!: addFlash() : méthode permettant de déclarer un message de validation stocké en session
+            //TODO arguments :
+            //TODO 1. Identifiant du message (succès)
+            //TODO 2. Le message utilisateur
+            $this->addFlash('success',"Le commentaire a été publié avec succès");
+            /*
+                session
+                array(
+                    success => [
+                        0 => "Le commentaire a été posté avec succès !"
+                    ]
+                )
+            */
+
+            dump($comment);
+
+            // Après l'insertion, on redirige l'internaute vers l'affichage de l'article afin de rebooter le formulaire
+            return $this->redirectToRoute('blog_show', [
+                'id' => $article->getId()
+            ]);
+        }
         
 
         // Affichera le template blog/show.html.twig
         return $this->render('blog/show.html.twig', [
             'articleBDD' => $article, //! On transmet au template les données de l'articles sélectionné en BDD afin de les traiter avec le langage TWIG dans le template
-            'formComment' => $formComment->createView()
+            'formComment' => $formComment->createView() //TODO on doit executer cette méthode afin que Twig puisse traiter la vue via cet objet et faire un affichage
         ]);
     }
 
