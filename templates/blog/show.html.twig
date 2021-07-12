@@ -1,76 +1,98 @@
 {% extends "base.html.twig" %}
 
 {% block title %}
-    Blog | Détails article
+	Blog | Détails article
 {% endblock %}
 
 {% block body %}
 
-{# <pre> 
-	{{ dump(articleBDD) }}
-</pre>
-#}
+	{# <pre> 
+		{{ dump(articleBDD) }}
+	</pre>
+	#}
 
-    {# <h1 class="display-4 fst-italic text-center my-4">Détail de l'article</h1> #}
+	{# <h1 class="display-4 fst-italic text-center my-4">Détail de l'article</h1> #}
 	{# Pas besoin de boucler car on a besoin d'afficher que l'article sélectionné dans notre cas: on affiche 1 seul article #}
 
-    <div class="col-md-12">
-			<div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm position-relative">
-				<div class="col md-7 p-4 d-flex flex-column position-static">
-					<strong class="d-inline-block mb-2 text-primary">{{articleBDD.category.titre}}</strong>
+		<div class="col-md-12"> <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm position-relative">
+			<div class="col md-7 p-4 d-flex flex-column position-static">
+				<strong class="d-inline-block mb-2 text-primary">{{articleBDD.category.titre}}</strong>
 
-					<h3 class="mb-0">{{articleBDD.titre}}</h3>
+				<h3 class="mb-0">{{articleBDD.titre}}</h3>
 
-					<div class="mb-1 text-muted">Posté le {{ articleBDD.date|date('d/m/Y à H:i:s')}}</div>
+				<div class="mb-1 text-muted">Posté le
+					{{ articleBDD.date|date('d/m/Y à H:i:s')}}</div>
 
-					<p class="card-text">{{articleBDD.contenu|raw}}</p>
+				<p class="card-text">{{articleBDD.contenu|raw}}</p>
 
-					{# la fonction path() attend en argument le NOM de la route définie dans le controller dans l'annotation @Route("", name = "NOM_ROUTE"), 
-					@Route("/blog", name="blog")
-					ici le nom de la route est 'blog'#}
-					<a href="{{path('blog')}}">Retour à la liste des articles</a>
-					<a href="{{path('blog_edit', {'id': articleBDD.id}) }}">Modification de l'article</a>  
-				</div>
-				<div class="col-md-5 d-none d-lg-block d-none d-lg-block">
-					<img src="{{ articleBDD.image}}" alt="{{ articleBDD.titre}}" classe="col-md-12">
-				</div>
+				{# la fonction path() attend en argument le NOM de la route définie dans le controller dans l'annotation @Route("", name = "NOM_ROUTE"), 
+									@Route("/blog", name="blog")
+									ici le nom de la route est 'blog'#}
+				<a href="{{path('blog')}}">Retour à la liste des articles</a>
+				<a href="{{path('blog_edit', {'id': articleBDD.id}) }}">Modification de l'article</a>
 			</div>
-
-			{# Affichage du formulaire d'ajout de commentaire #}
-			<h4 class="mt-5 mb-2">Donner votre avis...</h4>
-
-			{{form_start(formComment)}}
-
-			{{form_row(formComment.auteur)}}
-			{{form_row(formComment.contenuDuCommentaire)}}
-			<button type="submit" class="btn btn-dark mt-2">Publier</button>
-
-			{{form_end(formComment)}}
-
-			{# Affichage des commentaires #}
-			<h4 class="mt-5 mb-2">Vos réactions...</h4>
-
-			<div class="row">
-			{# articleBDD.comments : objet contenant tous les commentaires lié à l'article #}
-			{# Grace aux aux relations entre les tables (bi-directionnelle), en selectionnant dans la table 'Article', nous avons accès automatiquement à toute les correspondances dans les autres tables #}
-
-			{% for oneComment in articleBDD.comments %}
-			{# {{dump(oneComment)}} #}
-
-			<div class="row shadow rounded mx-0 px-0 mb-2">
-				<div class="col-md-4 py-2">
-					<strong>{{oneComment.auteur}}</strong>
-					<small class="fst-italic">Posté le {{oneComment.date|date('d/m/Y à H:i:s')}}</small>
-				</div>
-				<div class="col-md-8 py-2">
-					{# écriture d'origine: 'contenu_du_commentaire' : TWIG ne le reconnait pas, on a dû changer et mettre des majuscules. En revanche, SQL ne reconnait pas les majuscules et garde 'contenu_du_commentaire' #}
-					{{oneComment.contenuDuCommentaire|raw}}
-				</div>
-
-			
-			</div>
-				
-			{% endfor %}
+			<div class="col-md-5 d-none d-lg-block d-none d-lg-block">
+				<img src="{{ articleBDD.image}}" alt="{{ articleBDD.titre}}" classe="col-md-12">
 			</div>
 		</div>
+
+		{# Affichage message validation Utilisateur #}
+		{# app: objet Twig qui contient toutes les données de la session en cours, du fichier de session #}
+		{# flashes() : méthode permettant d'accéder en session au message flash utilisateur déclarés dans le controlleur, il faut lui fournir en argument l'identifiant (success) #}
+		{# message: variable de réception qui nous définissons, qui réceptionne un message utilisateur par tour de boucle #}
+			{% for message in app.flashes('success') %}
+				<div class="col-md-4 mx-auto alert alert-primary text-center p-2"> {{ message }}
+			</div>
+
+		{% endfor %}
+
+
+		{# Affichage du formulaire d'ajout de commentaire #}
+		<h4 class="mt-5 mb-2">Donner votre avis...</h4>
+
+		{{form_start(formComment)}}
+
+		{{form_row(formComment.auteur)}}
+		{{form_row(formComment.contenuDuCommentaire)}}
+		<button type="submit" class="btn btn-dark mt-2">Publier</button>
+
+		{{form_end(formComment)}}
+
+		{# Affichage des commentaires #}
+		<h4 class="mt-5 mb-2">Vos réactions...</h4>
+
+		<div class="row mb-5">
+		{# Si l'article possède bien des commentaire, si l'objet articleBDD.comments n'est pas vide, alors on entre dans le condition IF et onaffiche les commentaires #}
+
+			{% if articleBDD.comments is not empty %}
+			
+				{# articleBDD.comments : objet contenant tous les commentaires lié à l'article #}
+				{# Grace aux aux relations entre les tables (bi-directionnelle), en sélectionnant dans la table 'Article', nous avons accès automatiquement à toute les correspondances dans les autres tables #}
+					<div class="row shadow rounded mx-0 px-0 mb-2"> {% for oneComment in articleBDD.comments %}
+						{# pour chaque commentaire dans la méthode show, on envoie tous les commentaires lié à 1 article. 
+												oneComment = variable de réception, réceptionne les info du commentaire (auteur, date, contenu du commentaire) #}
+						{# {{dump(oneComment)}} #}
+
+
+							<div class="col-md-4 py-2"> <strong>{{oneComment.auteur}}</strong>
+							<small class="fst-italic">Posté le
+								{{oneComment.date|date('d/m/Y à H:i:s')}}</small>
+						</div>
+						<div
+							class="col-md-8 py-2">
+							{# écriture d'origine: 'contenu_du_commentaire' : TWIG ne le reconnait pas, on a dû changer et mettre des majuscules. En revanche, SQL ne reconnait pas les majuscules et garde 'contenu_du_commentaire' #}
+							{{oneComment.contenuDuCommentaire|raw}}
+						</div>
+					{% endfor %}
+				</div>
+
+				{% else %}
+				{# Sinon l'article n'est associé à aucun commentaire, on entre dans le ELSE et on affiche un message à l'utilisateur #}
+				<p class="fst-italic text-center">Soyez le premier à donner votre avis</p>
+
+			{% endif %}
+
+
+		</div>
+	</div>
 {% endblock %}
