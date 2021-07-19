@@ -133,11 +133,11 @@ class BlogController extends AbstractController
            $article = new Article;
         }
 
-        //! En renseigant les setteurs de l'entité on s'apperçoit que les valeurs sont envoyées directement dans les attributs 'value'du formulaire, cela est dû au fait que l'entité $article est relié au formulaire
+        //! En renseignant les setteurs de l'entité on s'apperçoit que les valeurs sont envoyées directement dans les attributs 'value'du formulaire, cela est dû au fait que l'entité $article est relié au formulaire
         //$article->setTitre('Faux titre')
          //       ->setContenu ('Faux contenu');
 
-        dump($request);
+        //dump($request);
 
         //TODO createForm() permet ici de créer un formulaire d'ajout d'article en fonction de la classe ArticleType (que l'on trouve dans form et que nous avions créé)
         //TODO En 2ème argument de createForm(), nous transmettons l'objet entité $article afin de préciser que le formulaire a pour but de remplir l'objet $article, on relie l'entité au formulaire
@@ -146,7 +146,8 @@ class BlogController extends AbstractController
         //? handleRequest() permet ici dans notre cas, de récupérer toutes les données saisies dans le formulaire et de les transmettre aux bons setteurs de l'entité $article 
         //! handleRequest() renseigne chaque setteur de l'entité $article avec les données saisies dans le formulaire
         $formArticle->handleRequest($request);
-        dump($article);
+        //dump($article);
+        //dd($formArticle);
 
         //? Si le formulaire a bien été validé && que toutes les données saisies sont bien transmises à la bonne entité, alors on entre dans la condition IF
         if($formArticle->isSubmitted() && $formArticle->isValid())
@@ -159,21 +160,24 @@ class BlogController extends AbstractController
                 $article->setDate(new \DateTime());
             }
             
+            $tags = $formArticle->get('tags')->getData();
+            //dd($tags[0]);# C'est un tableau, et pour récupérer la données, il faut indiquer les crochets[]: dd($tags[0]->getName());
+            $article->addTag($tags[0]);
 
             //! Pour manipuler les lignes de la BDD (INSERT, UPDATE, DELETE), nous avons besoin d'un mamager (EntityManagerInterface)
-            //? persist() : méthode issue de l'interface EntityManagerInterface permettant de préparer et garder en mémmoire la requête d'insertion
-            //TODO equivaut à $data = $bdd->prepare("INSERT INTO article VALUES ('$article->getTitre()', '$article->getContenu()')")
+            //? persist() : méthode issue de l'interface EntityManagerInterface permettant de préparer et garder en mémoire la requête d'insertion
+            #equivaut à $data = $bdd->prepare("INSERT INTO article VALUES ('$article->getTitre()', '$article->getContenu()')")
             $manager->persist($article);
             
 
-            //? flush() : méthode issue de l'interface EntityManagerInterface permettant veritablement d'executer le requete d'insertion en BDD
-            //TODO $data->excecute()
+            //? flush() : méthode issue de l'interface EntityManagerInterface permettant véritablement d'exécuter le requête d'insertion en BDD
+            # $data->excecute()
             $manager->flush();
 
             //? Nous redirigeons l'internaute après l'insertion de l'article en BDD vers une autre route via la méthode redirectToRoute
-            //TODO: cette methode attend 2 arguments:
-            //TODO 1) la Route
-            //TODO 1) le paramètre a transmettre dans la route, dans notre cas l'ID de l'article
+            # cette methode attend 2 arguments:
+            # 1) la Route
+            # 2) le paramètre à transmettre dans la route, dans notre cas l'ID de l'article
             return $this->redirectToRoute('blog_show', [
                 'id' =>$article->getId()
             ]);
@@ -199,12 +203,13 @@ class BlogController extends AbstractController
      * 
      * @Route("/blog/{id}", name="blog_show")
      */
+
     //?public function show($id): Response / SANS L'INJECTION DE DEPENDANCE
     //TODO Avec l'injection de dépendance:
     //! public function show(ArticleRepository $repoArticle, $id): Response
     public function show(Article $article, Request $request, EntityManagerInterface $manager): Response //! sera suivi de render
     {
-        //TODO: l'id transmis dans l'URL est envoyé directement en argument de la fonction show(), ce qui nous permet d'avoir accès à l'id de l'article à sélectionnet en BDD au sein de la méthode show()
+        //TODO: l'id transmis dans l'URL est envoyé directement en argument de la fonction show(), ce qui nous permet d'avoir accès à l'id de l'article à sélectionner en BDD au sein de la méthode show()
         //dump($id);// 4
         dump($request);// Les données du commentaire vont bien dans le request
 
@@ -244,7 +249,7 @@ class BlogController extends AbstractController
             $manager->flush($comment);
 
             //!: addFlash() : méthode permettant de déclarer un message de validation stocké en session
-            //TODO arguments :
+            //? arguments :
             //TODO 1. Identifiant du message (succès)
             //TODO 2. Le message utilisateur
             $this->addFlash('success',"Le commentaire a été publié avec succès");
@@ -272,10 +277,6 @@ class BlogController extends AbstractController
             'formComment' => $formComment->createView() //TODO on doit executer cette méthode afin que Twig puisse traiter la vue via cet objet et faire un affichage
         ]);
     }
-
-    
-
-
 }
 
 

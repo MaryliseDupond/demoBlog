@@ -29,6 +29,13 @@
 									@Route("/blog", name="blog")
 									ici le nom de la route est 'blog'#}
 				<a href="{{path('blog')}}">Retour à la liste des articles</a>
+
+				{# .first (persistent collection) agit à l'identique du [0]: il vient chercher le 1er indice du tableau que l'on a fait dans le BlogController #}
+				{% for tag in articleBDD.tags %}
+					<p class = "mt-0"> Tag: {{tag.name}}</p>
+				{% endfor %}
+				
+
 				<a href="{{path('blog_edit', {'id': articleBDD.id}) }}">Modification de l'article</a>
 			</div>
 			<div class="col-md-5 d-none d-lg-block d-none d-lg-block">
